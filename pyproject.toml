@@ -14,7 +14,7 @@ authors = [
 ]
 
 dependencies = [
-  "gitingest>=0.7.0"
+  "gitingest"
 ]
 
 [project.urls]
