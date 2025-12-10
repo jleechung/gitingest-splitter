@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gitingest-splitter"
+version = "0.1.0"
+description = "Adaptive multi-file splitter for gitingest digests"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+  { name = "Your Name" }
+]
+
+dependencies = [
+  "gitingest>=0.7.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/yourname/gitingest-splitter"
+
+[project.scripts]
+adaptive-gitingest = "gitingest_splitter.adaptive_gitingest:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gitingest_splitter"]
