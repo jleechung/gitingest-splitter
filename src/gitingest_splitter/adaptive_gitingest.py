@@ -33,6 +33,29 @@ from fnmatch import fnmatch
 import uuid
 
 
+def extract_local_patterns(exclude_patterns: List[str], current_dir_name: str) -> List[str]:
+    """
+    Extract patterns that should apply when inside a specific directory.
+    
+    E.g., 'datasetcard/*.txt' becomes '*.txt' when current_dir_name is 'datasetcard'
+         '**/datasetcard/*.txt' becomes '*.txt' when current_dir_name is 'datasetcard'
+    """
+    local_patterns = []
+    for pattern in exclude_patterns:
+        # Split by '/' and find if current directory name is in the pattern
+        parts = pattern.split('/')
+        for i, part in enumerate(parts):
+            # Match exact directory name or '**' wildcard
+            if (part == current_dir_name or part == '**') and i < len(parts) - 1:
+                # Get everything after this directory
+                local_pattern = '/'.join(parts[i+1:])
+                # If the part was '**', continue matching in subdirectories
+                if part == '**':
+                    local_patterns.append(pattern)  # Keep the full pattern
+                local_patterns.append(local_pattern)
+    return local_patterns
+
+
 def run_gitingest(
     source: Path,
     output_path: Path,
@@ -168,6 +191,11 @@ def ingest_dir(
 
     # Exclude all child directories for the "local files" digest
     local_excludes = list(exclude_patterns)
+
+    # Add directory-specific exclude patterns
+    extra_patterns = extract_local_patterns(exclude_patterns, dir_path.name)
+    local_excludes.extend(extra_patterns)
+
     for child in child_dirs:
         # Use a glob that excludes everything under that child directory
         # e.g. "datasets/**", "nn/**", etc.
